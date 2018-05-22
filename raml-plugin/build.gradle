@@ -21,8 +21,16 @@ dependencies {
 intellij {
 	version = ideaVersion
 	plugins = ["yaml"]
-	pluginName = 'raml-plugin'  
+	pluginName 'raml-plugin'
 	publish {
 		pluginId '8459'
 	}
 }
+
+//prepareSandbox {
+//	def task = project.tasks.getByPath(':data-weave-plugin:prepareSandbox')
+//	from(new File(task.destinationDir, task.pluginName)) {
+//		into task.pluginName
+//	}
+//	dependsOn task
+//}

@@ -1,6 +1,14 @@
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/gen'
+            srcDir 'src/main/java'
+        }
+    }
+}
+
 configurations {
     gen
-
 }
 
 dependencies {
@@ -30,20 +38,21 @@ dependencies {
 }
 
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src/main/gen'
-        }
-    }
-}
 
 intellij {
     version = ideaVersion
     //plugins = ["maven", "groovy", 'properties', 'org.mule.tooling.intellij.dataweave', 'org.mule.tooling.intellij.raml']
-    plugins = ["maven", "Groovy", 'properties', project(':data-weave-plugin'), project(':raml-plugin')]
-    pluginName = 'mule-esb-plugin'
+    plugins = ["maven", "Groovy", 'properties', project(':data-weave-plugin')]
+    pluginName 'mule-esb-plugin'
     publish {
         pluginId '8212'
     }
 }
+
+//prepareSandbox {
+//    def task = project.tasks.getByPath(':data-weave-plugin:prepareSandbox')
+//    from(new File(task.destinationDir, task.pluginName)) {
+//        into task.pluginName
+//    }
+//    dependsOn task
+//}

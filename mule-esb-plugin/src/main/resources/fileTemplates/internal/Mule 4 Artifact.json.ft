@@ -1,0 +1,20 @@
+{
+  "configs": [
+    "${NAME}.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "${NAME}",
+  "minMuleVersion": "${MULE_VERSION}",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedResources": []
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

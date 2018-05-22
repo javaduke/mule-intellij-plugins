@@ -45,15 +45,15 @@ import java.util.List;
 
 public class MuleMavenModuleBuilder extends MavenModuleBuilder implements SourcePathsBuilder, MuleModuleBuilder {
 
-    public static final String DEFAULT_MULE_VERSION = "3.8.2";
+    public static final String DEFAULT_MULE_VERSION = "4.1.1";
     private String muleVersion = DEFAULT_MULE_VERSION;
 
     public MuleMavenModuleBuilder() {
-        setProjectId(new MavenId("org.mule.app", "my-app", "1.0.0-SNAPSHOT"));
+        setProjectId(new MavenId("com.mycompany.myproject", "my-app", "1.0.0-SNAPSHOT"));
     }
 
     @Override
-    public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
+    public void setupRootModel(ModifiableRootModel rootModel) {
         super.setupRootModel(rootModel);
 
         addListener(new ModuleBuilderListener() {
@@ -73,7 +73,11 @@ public class MuleMavenModuleBuilder extends MavenModuleBuilder implements Source
         final MavenId parentId = (this.getParentProject() != null ? this.getParentProject().getMavenId() : null);
 
         MavenUtil.runWhenInitialized(project, (DumbAwareRunnable) () -> {
-            new MuleMavenProjectBuilderHelper().configure(project, getProjectId(), muleVersion, root, parentId);
+            //TODO - depending on version, instantiate helper for v3 or v4
+            if (muleVersion.startsWith("3"))
+                new MuleMavenProjectBuilderHelper().configure(project, getProjectId(), muleVersion, root, parentId);
+            else
+                new Mule4MavenProjectBuilderHelper().configure(project, getProjectId(), muleVersion, root, parentId);
         });
     }
 

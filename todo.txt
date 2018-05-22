@@ -60,3 +60,8 @@ TODO: API Projects support:
 ~/Library/Caches
 ~/Library/Preferences
 ~/Library/Application Support
+
+3. MULE 4 SUPPORT
+
+- Versions of the individual modules/connectors are no longer the same as version of Mule - should I integrate with exchange?
+- Where are the XSDs located

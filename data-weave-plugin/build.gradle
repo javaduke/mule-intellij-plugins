@@ -2,6 +2,7 @@ sourceSets {
     main {
         java {
             srcDir 'src/main/gen'
+            srcDir 'src/main/java'
         }
     }
 }
@@ -29,7 +30,7 @@ dependencies {
 
 intellij {
     version = ideaVersion
-    pluginName = 'data-weave-plugin'
+    pluginName 'data-weave-plugin'
     publish {
         pluginId '8458'
     }
