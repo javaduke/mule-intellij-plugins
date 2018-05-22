@@ -17,20 +17,6 @@ Join the chat at
 * source code: https://github.com/machaval/mule-intellij-plugins/tree/master/data-weave-plugin
 * documentation: https://github.com/machaval/mule-intellij-plugins/tree/master/data-weave-plugin/docs
 
-## Importing project into IntelliJ
-
-To import project into IntelliJ IDEA and run plugin from within the IDE, perform the following steps:
-
-1. Select New -> Project..., then select IntelliJ Platform Plugin project type...
-2. Add the following JARs to your classpath:
-    * <IntelliJ installation directory>/plugins/maven/lib/maven.jar
-    * <IntelliJ installation directory>/plugins/maven/lib/maven-server-api.jar
-    * <IntelliJ installation directory>/plugins/maven/lib/plexus-utils-2.0.6.jar
-    * <project home>/lib/mule-plugin-debugger-3.8.0.jar
-    * Add gen to the project sources, add src/main/java to the project sources and remove the src
-
-Note, the version of gradle used to build the project is currently 2.14. If you experience build issues, check to make sure you are using this version of gradle. 
-
 # Note
 If you liked what the plugin please contribute either with code or issues.
 
