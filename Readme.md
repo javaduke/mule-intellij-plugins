@@ -17,8 +17,5 @@ Join the chat at
 * source code: https://github.com/machaval/mule-intellij-plugins/tree/master/data-weave-plugin
 * documentation: https://github.com/machaval/mule-intellij-plugins/tree/master/data-weave-plugin/docs
 
-# Note
-If you liked what the plugin please contribute either with code or issues.
-
 # Disclaimer
 This is not an official Mulesoft product and is not a replacement for the excellent Anypoint Studio product. This means there is no support for this!
