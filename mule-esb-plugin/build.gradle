@@ -42,7 +42,7 @@ dependencies {
 intellij {
     version = ideaVersion
     //plugins = ["maven", "groovy", 'properties', 'org.mule.tooling.intellij.dataweave', 'org.mule.tooling.intellij.raml']
-    plugins = ["maven", "Groovy", 'properties', project(':data-weave-plugin')]
+    plugins = [project(':data-weave-plugin'), project(':raml-plugin'), "maven", "Groovy", 'properties']
     pluginName 'mule-esb-plugin'
     publish {
         pluginId '8212'
@@ -50,9 +50,14 @@ intellij {
 }
 
 //prepareSandbox {
-//    def task = project.tasks.getByPath(':data-weave-plugin:prepareSandbox')
-//    from(new File(task.destinationDir, task.pluginName)) {
-//        into task.pluginName
+////    def task = project.tasks.getByPath(':data-weave-plugin:prepareSandbox')
+////    from(new File(task.destinationDir, task.pluginName)) {
+////        into task.pluginName
+////    }
+//    def task2 = project.tasks.getByPath(':raml-plugin:prepareSandbox')
+//    from(new File(task2.destinationDir, task2.pluginName)) {
+//        into task2.pluginName
 //    }
-//    dependsOn task
+////    dependsOn task
+//    dependsOn task2
 //}
