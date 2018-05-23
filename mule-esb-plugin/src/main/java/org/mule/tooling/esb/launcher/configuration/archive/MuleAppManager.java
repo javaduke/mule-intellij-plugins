@@ -17,10 +17,10 @@ public class MuleAppManager extends AbstractProjectComponent {
     }
 
     @NotNull
-    public File getMuleApp(@NotNull Module module) throws ExecutionException {
+    public File getMuleApp(@NotNull Module module, @NotNull String version) throws ExecutionException {
         final MavenProjectsManager instance = MavenProjectsManager.getInstance(module.getProject());
         if (instance.hasProjects()) {
-            return new MuleAppMavenHandler().getMuleApp(module);
+            return new MuleAppMavenHandler().getMuleApp(module, version);
         }
         throw new ExecutionException("Unable to find application builder");
     }

@@ -35,7 +35,7 @@ public class Mule4MavenProjectBuilderHelper
             createLog4J(project, projectId, resources);
             final VirtualFile muleConfigFile = createMuleConfigFile(project, projectId, appDirectory);
 
-            createMuleArtifactFile(project, projectId, root);
+            createMuleArtifactFile(project, projectId, muleVersion, root);
             createMuleArtifactPropertyFile(project, resources);
 
             //MUnit support
@@ -175,7 +175,7 @@ public class Mule4MavenProjectBuilderHelper
         }.execute().getResultObject();
     }
 
-    private VirtualFile createMuleArtifactFile(final Project project, final MavenId projectId, final VirtualFile appDirectory)
+    private VirtualFile createMuleArtifactFile(final Project project, final MavenId projectId, final String muleVersion, final VirtualFile appDirectory)
     {
         return new WriteCommandAction<VirtualFile>(project, "Create Mule Artifact File", PsiFile.EMPTY_ARRAY)
         {
@@ -188,6 +188,7 @@ public class Mule4MavenProjectBuilderHelper
                     VirtualFile configFile = appDirectory.findOrCreateChildData(this, "mule-artifact.json");
                     final Properties templateProps = new Properties();
                     templateProps.setProperty("NAME", projectId.getArtifactId());
+                    templateProps.setProperty("MULE_VERSION", muleVersion);
                     final FileTemplateManager manager = FileTemplateManager.getInstance(project);
                     final FileTemplate template = manager.getInternalTemplate(MuleFileTemplateDescriptorManager.MULE4_ARTIFACT_FILE);
                     final Properties defaultProperties = manager.getDefaultProperties();

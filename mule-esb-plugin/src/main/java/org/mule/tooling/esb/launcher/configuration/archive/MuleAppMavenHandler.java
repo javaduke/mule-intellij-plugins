@@ -15,7 +15,7 @@ public class MuleAppMavenHandler implements MuleAppHandler
 
     @NotNull
     @Override
-    public File getMuleApp(final Module module) throws ExecutionException
+    public File getMuleApp(final Module module, final String muleVersion) throws ExecutionException
     {
         String outputPath = null;
         final File outputDir;
@@ -37,7 +37,9 @@ public class MuleAppMavenHandler implements MuleAppHandler
             }
 
             File applicationZip = null;
-            final File[] zips = outputDir.listFiles((dir, name) -> name.endsWith("zip"));
+            final String extension = (muleVersion.startsWith("4") ? "jar" : "zip");
+
+            final File[] zips = outputDir.listFiles((dir, name) -> name.endsWith(extension));
             if (zips != null && zips.length > 0)
             {
                 applicationZip = zips[0];

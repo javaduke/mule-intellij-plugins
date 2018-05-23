@@ -10,6 +10,6 @@ import java.io.File;
 public interface MuleAppHandler {
 
     @NotNull
-    File getMuleApp(Module module) throws ExecutionException;
+    File getMuleApp(Module module, String majorVersion) throws ExecutionException;
 
 }

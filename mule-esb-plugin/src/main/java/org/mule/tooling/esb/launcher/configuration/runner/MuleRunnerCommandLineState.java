@@ -18,6 +18,8 @@ import org.mule.tooling.esb.launcher.configuration.MuleConfiguration;
 import org.mule.tooling.esb.launcher.configuration.archive.MuleAppManager;
 import org.mule.tooling.esb.launcher.configuration.ui.MuleRunnerEditor;
 import org.mule.tooling.esb.sdk.MuleClassPath;
+import org.mule.tooling.esb.sdk.MuleSdk;
+import org.mule.tooling.esb.sdk.MuleSdkManager;
 import org.mule.tooling.esb.util.MuleConfigUtils;
 
 import java.io.File;
@@ -27,7 +29,8 @@ import java.util.List;
 public class MuleRunnerCommandLineState extends JavaCommandLineState implements MuleRunnerState {
 
     //Mule Main Class
-    public static final String MAIN_CLASS = "org.mule.module.launcher.MuleContainer";
+    public static final String MULE_CONTAINER_MAIN_CLASS = "org.mule.module.launcher.MuleContainer";
+    public static final String MULE4_CONTAINER_MAIN_CLASS = "org.mule.runtime.module.launcher.MuleContainer";
 
     private MuleConfiguration model;
 
@@ -55,6 +58,9 @@ public class MuleRunnerCommandLineState extends JavaCommandLineState implements 
 //        }
 
         final String muleHome = model.getMuleHome();
+        MuleSdk muleSdk = MuleSdkManager.getInstance().findSdk(muleHome);
+        String muleVersion = muleSdk.getVersion();
+
         final MuleClassPath muleClassPath = new MuleClassPath(new File(muleHome));
         final List<File> urLs = muleClassPath.getJars();
         for (File jar : urLs) {
@@ -64,7 +70,7 @@ public class MuleRunnerCommandLineState extends JavaCommandLineState implements 
         javaParams.getClassPath().add(muleHome + "/conf");
         
         //Mule main class
-        javaParams.setMainClass(MAIN_CLASS);
+        javaParams.setMainClass(muleVersion.startsWith("4") ? MULE4_CONTAINER_MAIN_CLASS : MULE_CONTAINER_MAIN_CLASS);
 
         //Add default vm parameters
         javaParams.getVMParametersList().add("-Dmule.home=" + muleHome);
@@ -75,7 +81,7 @@ public class MuleRunnerCommandLineState extends JavaCommandLineState implements 
         javaParams.getVMParametersList().add("-Dorg.glassfish.grizzly.nio.transport.TCPNIOTransport.max-receive-buffer-size=1048576");
         javaParams.getVMParametersList().add("-Dorg.glassfish.grizzly.nio.transport.TCPNIOTransport.max-send-buffer-size=1048576");
         javaParams.getVMParametersList().add("-Djava.endorsed.dirs=" + muleHome + "/lib/endorsed ");
-        javaParams.getVMParametersList().add("-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager");
+        //javaParams.getVMParametersList().add("-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager");
         javaParams.getVMParametersList().add("-Dmule.forceConsoleLog=true");
 
         if (isDebug) {
@@ -153,14 +159,25 @@ public class MuleRunnerCommandLineState extends JavaCommandLineState implements 
                 FileUtil.delete(moduleAppData);
             }
 
+            MuleSdk muleSdk = MuleSdkManager.getInstance().findSdk(model.getMuleHome());
+            String muleVersion = muleSdk.getVersion();
+
+            String extension = ".zip";
+            String domainExtension = ".zip";
+
+            if (muleVersion != null && muleVersion.startsWith("4")) {
+                extension = "-mule-application.jar";
+                domainExtension = "-mule-domain.jar";
+            }
+
             //Get the zip and deploy it
-            final File file = MuleAppManager.getInstance(model.getProject()).getMuleApp(m);
+            final File file = MuleAppManager.getInstance(model.getProject()).getMuleApp(m, muleVersion);
 
             try {
                 if (MuleConfigUtils.isMuleDomainModule(m))
-                    FileUtil.copy(file, new File(domains, m.getName() + ".zip"));
+                    FileUtil.copy(file, new File(domains, m.getName() + domainExtension));
                 else
-                    FileUtil.copy(file, new File(apps, m.getName() + ".zip"));
+                    FileUtil.copy(file, new File(apps, m.getName() + extension));
                 //FileUtil.copy(file, new File(apps, model.getProject().getName() + ".zip"));
             } catch (IOException e) {
                 e.printStackTrace();
