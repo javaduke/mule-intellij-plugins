@@ -63,5 +63,11 @@ TODO: API Projects support:
 
 3. MULE 4 SUPPORT
 
-- Versions of the individual modules/connectors are no longer the same as version of Mule - should I integrate with exchange?
-- Where are the XSDs located
+********** - UI for Exchange Maven facade integration
+- How to generate schemas for connectors that dont have XSDs
+- APIKit scaffolding - what are the dependency JARs, class names etc. Any example or source code snippet?
+- Same as above for SOAPKit scaffolding
+- Verify functionality - debugger, remote debgger
+- Live templates
+
+

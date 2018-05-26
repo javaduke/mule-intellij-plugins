@@ -313,6 +313,11 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="NewGroup1"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
+        <action id="Mule.AddDependency"
+                class="org.mule.tooling.esb.actions.AddDependencyFromExchangeAction">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="NewGroup1"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
 
         <action id="Mule.ExtractToFlow"
                 class="org.mule.tooling.esb.actions.ExtractToFlowAction"

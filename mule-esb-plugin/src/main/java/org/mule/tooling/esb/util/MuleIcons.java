@@ -18,6 +18,8 @@ public class MuleIcons {
     //public static final Icon DataWeaveIcon = IconLoader.findIcon("/dataweave.png");
     public static final Icon ConnectorIcon = IconLoader.findIcon("/connector.png");
     public static final Icon MuleRemoteDebugIcon = IconLoader.findIcon("/mule-remote-debug.png");
+    public static final Icon AnypointExchangeIcon = IconLoader.findIcon("/anypoint_exchange.png");
+
     private MuleIcons() {
         super();
     }

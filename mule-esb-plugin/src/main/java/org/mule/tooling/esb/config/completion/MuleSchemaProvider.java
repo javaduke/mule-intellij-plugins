@@ -54,7 +54,7 @@ public class MuleSchemaProvider extends XmlSchemaProvider {
 
     @Override
     public boolean isAvailable(@NotNull XmlFile file) {
-        return MuleConfigUtils.isMuleFile(file);
+        return MuleConfigUtils.isMuleFile(file) || file.getVirtualFile().getExtension().contains("xsd");
     }
 
     /**
@@ -291,7 +291,13 @@ public class MuleSchemaProvider extends XmlSchemaProvider {
         private Map<String, String> getSchemasFromSpringSchemas(@NotNull Module module) throws Exception {
             Map<String, String> schemasMap = new HashMap<>();
 
-            PsiFile[] psiFiles = FilenameIndex.getFilesByName(module.getProject(), "spring.schemas", GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module));
+            PsiFile[] springSchemas = FilenameIndex.getFilesByName(module.getProject(), "spring.schemas", GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module));
+            PsiFile[] muleSchemas = FilenameIndex.getFilesByName(module.getProject(), "mule.schemas", GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module));
+
+            final ArrayList<PsiFile> schemasList = new ArrayList<PsiFile>(Arrays.asList(springSchemas));
+            schemasList.addAll(new ArrayList<PsiFile>(Arrays.asList(muleSchemas)));
+
+            PsiFile[] psiFiles = schemasList.toArray(new PsiFile[schemasList.size()]);
 
             for (PsiFile nextSpringS : psiFiles) {
                 VirtualFile springSchemasFile = nextSpringS.getVirtualFile();
@@ -302,7 +308,7 @@ public class MuleSchemaProvider extends XmlSchemaProvider {
             }
 
             //Fix for HTTP module schema vs old HTTP transport schema
-            schemasMap.put("http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd", "META-INF/mule-httpn.xsd");
+            //schemasMap.put("http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd", "META-INF/mule-httpn.xsd");
 
             return schemasMap;
         }
