@@ -69,6 +69,17 @@ public class MuleStackFrame extends XStackFrame
     }
 
     @Override
+    public void computeChildren(@NotNull XCompositeNode node) {
+        final XValueChildrenList children = new XValueChildrenList();
+        children.add("Message Processor", new MessageProcessorInfoValue(this.session, this.muleMessageInfo.getMessageProcessorInfo()));
+        if (exceptionThrown != null)
+        {
+            children.add("Exception", new ObjectFieldDefinitionValue(this.session, exceptionThrown, AllIcons.General.Error));
+        }
+        node.addChildren(children, true);
+    }
+/*
+    @Override
     public void computeChildren(@NotNull XCompositeNode node)
     {
         final XValueChildrenList children = new XValueChildrenList();
@@ -84,6 +95,6 @@ public class MuleStackFrame extends XStackFrame
         children.add("OutboundProperties", new MapOfObjectFieldDefinitionValue(this.session, this.muleMessageInfo.getOutboundProperties(), AllIcons.Nodes.Parameter));
         node.addChildren(children, true);
     }
-
+*/
 }
 

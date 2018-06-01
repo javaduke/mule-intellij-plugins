@@ -2,6 +2,7 @@ package org.mule.tooling.esb.exchange.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.ui.FilterComponent;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.ListTableModel;
@@ -42,7 +43,7 @@ public class ExchangeDependencyDialog extends DialogWrapper {
 
     private JBTable myInputsTable;
 
-    private final ListTableModel<ExchangeArtifact> myTableModel = getTableModel();
+    private ListTableModel<ExchangeArtifact> myTableModel;
 
     private ExchangeArtifact[] mySelectedArtifacts = new ExchangeArtifact[] {};
 
@@ -53,117 +54,9 @@ public class ExchangeDependencyDialog extends DialogWrapper {
         setModal(true);
         setTitle("Add Connector Dependency from Anypoint Exchange");
 
-        myInputsTable = new JBTable();
+        //createTable();
 
-        myInputsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-
-                List<ExchangeArtifact> artifacts = new ArrayList<>();
-
-                if (!lsm.isSelectionEmpty()) {
-                    // Find out which indexes are selected.
-                    int minIndex = lsm.getMinSelectionIndex();
-                    int maxIndex = lsm.getMaxSelectionIndex();
-                    for (int i = minIndex; i <= maxIndex; i++) {
-                        if (lsm.isSelectedIndex(i)) {
-                            int modelIndex = myInputsTable.convertRowIndexToModel(i);
-                            artifacts.add(myTableModel.getItem(modelIndex));
-                        }
-                    }
-                }
-
-                mySelectedArtifacts = artifacts.toArray(new ExchangeArtifact[] {});
-            }
-        });
-
-        updateTable();
-
-        myInputsTable.getEmptyText().setText("No Connectors Found.");
-        myInputsTable.setColumnSelectionAllowed(false);
-        myInputsTable.setShowGrid(true);
-        myInputsTable.setDragEnabled(false);
-        myInputsTable.setShowHorizontalLines(true);
-        myInputsTable.setShowVerticalLines(true);
-        myInputsTable.setIntercellSpacing(new Dimension(0, 0));
-        myInputsTable.setRowSelectionAllowed(true);
-        myInputsTable.setExpandableItemsEnabled(true);
-        myInputsTable.setStriped(true);
-        myInputsTable.setRowHeight(myInputsTable.getRowHeight() + 10);
-        myInputsTable.setAutoCreateRowSorter(true);
-        myInputsTable.setVisible(true);
-
-        mainPane.add(ScrollPaneFactory.createScrollPane(myInputsTable));
-
-        filterComponent.getTextEditor().addKeyListener(new KeyAdapter() {
-            public void keyTyped(final KeyEvent e) {
-                String filterText = filterComponent.getTextEditor().getText();
-                DefaultRowSorter rowSorter = (DefaultRowSorter)myInputsTable.getRowSorter();
-                if (StringUtils.isEmpty(filterText))
-                    rowSorter.setRowFilter(null);
-                else
-                    rowSorter.setRowFilter(RowFilter.regexFilter(filterComponent.getTextEditor().getText()));
-            }
-        });
-    }
-
-    protected ListTableModel<ExchangeArtifact> getTableModel() {
-        return new ExchangeArtifactTableModel();
-    }
-
-    private void updateTable() {
-        try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpPost post = new HttpPost(ANYPOINT_EXCHANGE_URL);
-            post.setHeader("Content-Type", "application/json");
-            StringEntity entity = new StringEntity(EXCHANGE_QUERY);
-            post.setEntity(entity);
-
-            StringBuffer jsonResponse = new StringBuffer();
-
-            HttpResponse httpResponse = client.execute(post);
-            if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(httpResponse.getEntity().getContent()));
-                String inputLine;
-
-                while ((inputLine = reader.readLine()) != null) {
-                    jsonResponse.append(inputLine);
-                }
-                reader.close();
-
-                logger.debug(jsonResponse.toString());
-            }
-            ((CloseableHttpClient) client).close();
-
-            final List<ExchangeArtifact> artifacts = new ArrayList<>();
-
-            JSONObject responseObject = new JSONObject(jsonResponse.toString());
-            JSONArray assets = responseObject.getJSONObject("data").getJSONArray("assets");
-
-            for (int i = 0; i < assets.length(); i++) {
-                JSONObject nextAsset = assets.getJSONObject(i);
-                ExchangeArtifact nextArtifact = new ExchangeArtifact(nextAsset.getString("groupId"),
-                        nextAsset.getString("assetId"),
-                        StringUtils.isEmpty(nextAsset.getString("classifier")) ? "mule-plugin" : nextAsset.getString("classifier"),
-                        nextAsset.getString("version"),
-                        nextAsset.getString("runtimeVersion"),
-                        nextAsset.getString("name"),
-                        nextAsset.getString("description"));
-                artifacts.add(nextArtifact);
-            }
-
-            myTableModel.setSortable(true);
-            myTableModel.setItems(artifacts);
-            myInputsTable.setModel(myTableModel);
-
-            //if (!artifacts.isEmpty()) {
-            //    myInputsTable.getSelectionModel().setSelectionInterval(0, 0);
-            //}
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        filterComponent.setMyTable(myInputsTable);
     }
 
     public ExchangeArtifact[] getSelectedArtifacts() {
@@ -199,5 +92,121 @@ public class ExchangeDependencyDialog extends DialogWrapper {
 
     public void setMyInputsTable(JBTable myInputsTable) {
         this.myInputsTable = myInputsTable;
+    }
+
+    private void createTable() {
+        myTableModel = new ExchangeArtifactTableModel();
+
+        myInputsTable.setAutoCreateRowSorter(true);
+        myInputsTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        updateTable();
+
+        myInputsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+
+                logger.info("Number of selected rows " + myInputsTable.getSelectedRows().length);
+                for (int si : myInputsTable.getSelectedRows())
+                    logger.info(">>> next row " + si);
+
+                ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+
+                List<ExchangeArtifact> artifacts = new ArrayList<>();
+
+                if (!lsm.isSelectionEmpty()) {
+                    // Find out which indexes are selected.
+                    int minIndex = lsm.getMinSelectionIndex();
+                    int maxIndex = lsm.getMaxSelectionIndex();
+                    for (int i = minIndex; i <= maxIndex; i++) {
+                        if (lsm.isSelectedIndex(i)) {
+                            int modelIndex = myInputsTable.convertRowIndexToModel(i);
+                            logger.info(">>> ModelIndex " + modelIndex);
+                            logger.info(">>> ViewIndex " + myInputsTable.convertRowIndexToView(i));
+
+                            artifacts.add(myTableModel.getItem(modelIndex));
+                        }
+                    }
+                }
+
+                mySelectedArtifacts = artifacts.toArray(new ExchangeArtifact[] {});
+            }
+        });
+
+        myInputsTable.getEmptyText().setText("No Connectors Found.");
+        myInputsTable.setColumnSelectionAllowed(false);
+        myInputsTable.setRowSelectionAllowed(true);
+        myInputsTable.setShowGrid(true);
+        myInputsTable.setDragEnabled(false);
+        myInputsTable.setShowHorizontalLines(true);
+        myInputsTable.setShowVerticalLines(true);
+        myInputsTable.setIntercellSpacing(new Dimension(0, 0));
+        myInputsTable.setExpandableItemsEnabled(true);
+        myInputsTable.setStriped(true);
+        myInputsTable.setRowHeight(myInputsTable.getRowHeight() + 10);
+        myInputsTable.setVisible(true);
+
+//        mainPane.add(ScrollPaneFactory.createScrollPane(myInputsTable));
+//        filterComponent = new ExchangeArtifactFilter(myInputsTable);
+
+    }
+
+    private void updateTable() {
+        try {
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpPost post = new HttpPost(ANYPOINT_EXCHANGE_URL);
+            post.setHeader("Content-Type", "application/json");
+            StringEntity entity = new StringEntity(EXCHANGE_QUERY);
+            post.setEntity(entity);
+
+            StringBuffer jsonResponse = new StringBuffer();
+
+            HttpResponse httpResponse = client.execute(post);
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(httpResponse.getEntity().getContent()));
+                String inputLine;
+
+                while ((inputLine = reader.readLine()) != null) {
+                    jsonResponse.append(inputLine);
+                }
+                reader.close();
+
+                logger.debug("JSON Response is " + jsonResponse.toString());
+            }
+            ((CloseableHttpClient) client).close();
+
+            final List<ExchangeArtifact> artifacts = new ArrayList<>();
+
+            JSONObject responseObject = new JSONObject(jsonResponse.toString());
+            JSONArray assets = responseObject.getJSONObject("data").getJSONArray("assets");
+
+            for (int i = 0; i < assets.length(); i++) {
+                JSONObject nextAsset = assets.getJSONObject(i);
+                ExchangeArtifact nextArtifact = new ExchangeArtifact(nextAsset.getString("groupId"),
+                        nextAsset.getString("assetId"),
+                        nextAsset.isNull("classifier") ? "mule-plugin" : nextAsset.getString("classifier"),
+                        nextAsset.getString("version"),
+                        nextAsset.getString("runtimeVersion"),
+                        nextAsset.getString("name"),
+                        nextAsset.getString("description"));
+                artifacts.add(nextArtifact);
+            }
+
+            //myTableModel.setSortable(true);
+            myTableModel.setItems(artifacts);
+            myInputsTable.setModel(myTableModel);
+
+            //if (!artifacts.isEmpty()) {
+            //    myInputsTable.getSelectionModel().setSelectionInterval(0, 0);
+            //}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createUIComponents() {
+        myInputsTable = new JBTable();
+        createTable();
     }
 }

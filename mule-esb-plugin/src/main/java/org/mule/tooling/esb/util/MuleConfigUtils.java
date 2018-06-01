@@ -567,6 +567,7 @@ public class MuleConfigUtils {
                     final XmlAttribute name = element.getAttribute(MuleConfigConstants.NAME_ATTRIBUTE);
                     if (name != null) {
                         path = "/" + MulePathUtils.escape(name.getValue()) + getGlobalElementCategory(element);
+                        //path = MulePathUtils.escape(name.getValue()) + getGlobalElementCategory(element);
                     }
                     break;
                 }

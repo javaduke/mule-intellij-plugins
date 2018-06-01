@@ -18,7 +18,29 @@
         </constraints>
         <properties/>
         <border type="none"/>
-        <children/>
+        <children>
+          <scrollpane id="9cdee">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="b4b9d" class="com.intellij.ui.table.JBTable" binding="myInputsTable" custom-create="true">
+                <constraints/>
+                <properties>
+                  <autoCreateRowSorter value="true"/>
+                  <autoResizeMode value="4"/>
+                  <dragEnabled value="false"/>
+                  <rowHeight value="20"/>
+                  <rowSelectionAllowed value="true"/>
+                  <showHorizontalLines value="true"/>
+                  <showVerticalLines value="true"/>
+                  <striped value="true"/>
+                  <updateSelectionOnSort value="true"/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
+        </children>
       </grid>
       <grid id="dedb5" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints>
@@ -29,6 +51,7 @@
         <children>
           <component id="6a73e" class="org.mule.tooling.esb.exchange.ui.ExchangeArtifactFilter" binding="filterComponent">
             <constraints border-constraint="Center"/>
+            <properties/>
           </component>
         </children>
       </grid>

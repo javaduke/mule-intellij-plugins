@@ -63,11 +63,14 @@ TODO: API Projects support:
 
 3. MULE 4 SUPPORT
 
-********** - UI for Exchange Maven facade integration
-- How to generate schemas for connectors that dont have XSDs
+- Adding dependency from Exchange - support private Exchange orgs
+
+- How to generate schemas for connectors that don't have XSDs
 - APIKit scaffolding - what are the dependency JARs, class names etc. Any example or source code snippet?
 - Same as above for SOAPKit scaffolding
-- Verify functionality - debugger, remote debgger
+- How does debugger expect breakpoints to be passed? WHat is the path format?
+
+- Verify functionality - debugger, remote debugger
 - Live templates
 
 

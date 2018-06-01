@@ -87,6 +87,7 @@ public class MuleRunnerCommandLineState extends JavaCommandLineState implements 
         if (isDebug) {
             javaParams.getVMParametersList().add("-Dmule.debug.enable=true");
             javaParams.getVMParametersList().add("-Dmule.debug.suspend=true");
+            javaParams.getVMParametersList().add("-Dmule.debug.port=6666"); //TODO Make it configurable!
         }
 
         javaParams.getVMParametersList().add("-Xms1024m");
