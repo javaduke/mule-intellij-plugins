@@ -72,6 +72,12 @@ public class MuleStackFrame extends XStackFrame
     public void computeChildren(@NotNull XCompositeNode node) {
         final XValueChildrenList children = new XValueChildrenList();
         children.add("Message Processor", new MessageProcessorInfoValue(this.session, this.muleMessageInfo.getMessageProcessorInfo()));
+
+        for (ObjectFieldDefinition definition : this.muleMessageInfo.getDefinitions()) {
+            children.add(definition.getName(), new ObjectFieldDefinitionValue(this.session, definition, AllIcons.Debugger.Value));
+        }
+        //children.add("Payload", new ObjectFieldDefinitionValue(this.session, this.muleMessageInfo.getPayloadDefinition(), AllIcons.Debugger.Value));
+
         if (exceptionThrown != null)
         {
             children.add("Exception", new ObjectFieldDefinitionValue(this.session, exceptionThrown, AllIcons.General.Error));

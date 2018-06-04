@@ -44,7 +44,9 @@ import org.mule.tooling.esb.config.model.Flow;
 import org.mule.tooling.esb.config.model.Mule;
 import org.mule.tooling.esb.config.model.SubFlow;
 import org.mule.tooling.esb.framework.facet.MuleFacet;
+import org.mule.tooling.esb.framework.facet.MuleFacetConfiguration;
 import org.mule.tooling.esb.framework.facet.MuleFacetType;
+import org.mule.tooling.esb.sdk.MuleSdk;
 import org.mule.tooling.lang.dw.parser.psi.WeavePsiUtils;
 
 import javax.xml.namespace.QName;
@@ -479,11 +481,16 @@ public class MuleConfigUtils {
         if (modulesToAppsMap != null && !StringUtils.isEmpty(modulesToAppsMap.get(deployableName)))
             deployableName = modulesToAppsMap.get(deployableName);
 
+        boolean isMule4 = MuleConfigUtils.isMule4Module(module);
+        //If Mule 4 - add "mule-application"
+        if (isMule4)
+            deployableName = deployableName + "-mule-application";
+
         final String conditionScript = conditionExpression != null ? asMelScript(conditionExpression.getExpression()) : null;
         final XmlTag tag = getXmlTagAt(module.getProject(), sourcePosition);
         if (tag != null) {
             //TODO - Module name is an app name - but can I get it from Maven? Or override it by using the additional param?
-            return new Breakpoint(getMulePath(tag), conditionScript, deployableName);
+            return new Breakpoint(getMulePath(tag, isMule4), conditionScript, deployableName);
         } else {
             final int line = sourcePosition.getLine();
             final Document document = FileDocumentManager.getInstance().getDocument(sourcePosition.getFile());
@@ -494,7 +501,7 @@ public class MuleConfigUtils {
                     final XmlTag weavePart = PsiTreeUtil.getParentOfType(xmlElement, XmlTag.class);
                     final XmlTag weaveTag = PsiTreeUtil.getParentOfType(weavePart, XmlTag.class);
                     int lineNumber = line + 1 - XSourcePositionImpl.createByElement(xmlElement).getLine();
-                    final String mulePath = getMulePath(weaveTag);
+                    final String mulePath = getMulePath(weaveTag, isMule4);
                     //TODO - Module name is an app name - but can I get it from Maven? Or override it by using the additional param?
                     return new Breakpoint(mulePath, getPrefix(weavePart) + "/" + (lineNumber + 1), conditionScript, deployableName);
                 }
@@ -554,6 +561,10 @@ public class MuleConfigUtils {
     }
 
     public static String getMulePath(XmlTag tag) {
+        return getMulePath(tag, false);
+    }
+
+    public static String getMulePath(XmlTag tag, boolean isMule4) {
         final LinkedList<XmlTag> elements = new LinkedList<>();
         while (!isMuleTag(tag)) {
             elements.push(tag);
@@ -566,8 +577,10 @@ public class MuleConfigUtils {
                 case 0: {
                     final XmlAttribute name = element.getAttribute(MuleConfigConstants.NAME_ATTRIBUTE);
                     if (name != null) {
-                        path = "/" + MulePathUtils.escape(name.getValue()) + getGlobalElementCategory(element);
-                        //path = MulePathUtils.escape(name.getValue()) + getGlobalElementCategory(element);
+                        //path = "/" + MulePathUtils.escape(name.getValue()) + getGlobalElementCategory(element);
+                        path = MulePathUtils.escape(name.getValue()) + getGlobalElementCategory(element);
+                        if (!isMule4)
+                            path = "/" + path;
                     }
                     break;
                 }
@@ -714,6 +727,37 @@ public class MuleConfigUtils {
         }
         return muleModule;
     }
+
+    public static boolean isMule4Module(Module module) {
+        boolean mule4Module = false;
+
+        ProjectFacetManager manager = ProjectFacetManager.getInstance(module.getProject());
+        final List<MuleFacet> facets = manager.getFacets(MuleFacetType.TYPE_ID, new Module[]{module});
+
+        if (facets != null && !facets.isEmpty()) {
+            for (MuleFacet nextFacet : facets) {
+                MuleFacetConfiguration configuration = nextFacet.getConfiguration();
+                if (!(StringUtils.isEmpty(configuration.getPathToSdk()))) {
+                    MuleSdk sdk = new MuleSdk(configuration.getPathToSdk());
+                    String sdkVersion = sdk.getVersion();
+                    if (sdkVersion.startsWith("4"))
+                        mule4Module = true;
+                }
+            }
+        }
+
+        if (!mule4Module) { //Check for src/main/apps too, since not all modules may have facet added
+            VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+            for (VirtualFile f : contentRoots) {
+                VirtualFile deployProperties = f.findFileByRelativePath("mule-artifact.json");
+                if (deployProperties != null && deployProperties.exists() && deployProperties.isValid())
+                    return true;
+            }
+        }
+        return mule4Module;
+    }
+
+    //TODO - Add isMule4Project and isMule4Module
 
     public static boolean isMuleDomainModule(Module module) {
         VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();

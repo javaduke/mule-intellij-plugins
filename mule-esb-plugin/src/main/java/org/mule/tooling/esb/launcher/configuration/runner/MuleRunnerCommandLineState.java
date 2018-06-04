@@ -7,6 +7,7 @@ import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -28,6 +29,7 @@ import java.util.List;
 
 public class MuleRunnerCommandLineState extends JavaCommandLineState implements MuleRunnerState {
 
+    private static final Logger logger = Logger.getInstance(MuleRunnerCommandLineState.class);
     //Mule Main Class
     public static final String MULE_CONTAINER_MAIN_CLASS = "org.mule.module.launcher.MuleContainer";
     public static final String MULE4_CONTAINER_MAIN_CLASS = "org.mule.runtime.module.launcher.MuleContainer";
@@ -87,7 +89,7 @@ public class MuleRunnerCommandLineState extends JavaCommandLineState implements 
         if (isDebug) {
             javaParams.getVMParametersList().add("-Dmule.debug.enable=true");
             javaParams.getVMParametersList().add("-Dmule.debug.suspend=true");
-            javaParams.getVMParametersList().add("-Dmule.debug.port=6666"); //TODO Make it configurable!
+            javaParams.getVMParametersList().add("-Dmule.debug.port=" + getPort());
         }
 
         javaParams.getVMParametersList().add("-Xms1024m");
@@ -204,6 +206,11 @@ public class MuleRunnerCommandLineState extends JavaCommandLineState implements 
 
     @Override
     public int getPort() {
-        return 6666;
+        try {
+            return Integer.parseInt(model.getDebugPort());
+        } catch (Exception e) {
+            logger.error("Unable to parse debug port, returning default 6666 : ", e);
+            return 6666;
+        }
     }
 }

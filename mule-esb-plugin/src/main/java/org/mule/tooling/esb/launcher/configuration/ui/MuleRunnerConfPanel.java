@@ -15,6 +15,7 @@ public class MuleRunnerConfPanel
     private JRadioButton alwaysRadioButton;
     private JRadioButton neverRadioButton;
     private JRadioButton promptRadioButton;
+    private JTextField debugPort;
 
 
     public MuleRunnerConfPanel()
@@ -49,5 +50,9 @@ public class MuleRunnerConfPanel
 
     public JRadioButton getPromptRadioButton() {
         return promptRadioButton;
+    }
+
+    public JTextField getDebugPort() {
+        return debugPort;
     }
 }

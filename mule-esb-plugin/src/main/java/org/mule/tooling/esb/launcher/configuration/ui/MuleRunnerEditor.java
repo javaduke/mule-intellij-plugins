@@ -43,6 +43,12 @@ public class MuleRunnerEditor extends SettingsEditor<MuleConfiguration>
         }
         this.configurationPanel.getVmArgsField().setText(runnerConfiguration.getVmArgs());
 
+        String debugPort = runnerConfiguration.getDebugPort();
+        if (StringUtils.isEmpty(debugPort))
+            debugPort = "6666";
+
+        this.configurationPanel.getDebugPort().setText(debugPort);
+
         String muleHome = runnerConfiguration.getMuleHome();
         if (StringUtils.isBlank(muleHome))
         {
@@ -79,6 +85,8 @@ public class MuleRunnerEditor extends SettingsEditor<MuleConfiguration>
         runnerConfiguration.setVmArgs(this.configurationPanel.getVmArgsField().getText());
         final Object selectedItem = this.configurationPanel.getMuleHome().getSelectedItem();
         runnerConfiguration.setMuleHome(selectedItem instanceof MuleSdk ? ((MuleSdk) selectedItem).getMuleHome() : "");
+
+        runnerConfiguration.setDebugPort(this.configurationPanel.getDebugPort().getText());
 
         if (this.configurationPanel.getAlwaysRadioButton().isSelected())
             runnerConfiguration.setClearData(CLEAR_DATA_ALWAYS);

@@ -73,4 +73,6 @@ TODO: API Projects support:
 - Verify functionality - debugger, remote debugger
 - Live templates
 
+- Mule Project Manager should support mule-artifact.json
+
 

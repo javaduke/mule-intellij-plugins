@@ -1,6 +1,7 @@
 package org.mule.tooling.esb.debugger.breakpoint;
 
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
@@ -18,6 +19,8 @@ public class MuleBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XB
     private Map<String, String> modulesToAppsMap;
     private MuleDebuggerSession debuggerManager;
 
+    final static Logger logger = Logger.getInstance(MuleBreakpointHandler.class);
+
     public MuleBreakpointHandler(MuleDebuggerSession debuggerManager, @Nullable Map<String, String>modulesToAppsMap)
     {
         super(MuleBreakpointType.class);
@@ -30,7 +33,7 @@ public class MuleBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XB
     {
         //TODO Here get map from the debuggerManager and pass to the toMuleBreakpoint
         final Breakpoint breakpoint = MuleConfigUtils.toMuleBreakpoint(debuggerManager.getProject(), xBreakpoint, modulesToAppsMap);
-        System.out.println("breakpoint added = " + breakpoint.getApplicationName() + "  , path  " + breakpoint.getPath());
+        logger.info("breakpoint added = " + breakpoint.getApplicationName() + "  , path  " + breakpoint.getPath());
         debuggerManager.addBreakpoint(breakpoint);
     }
 
@@ -38,7 +41,7 @@ public class MuleBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XB
     public void unregisterBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> xBreakpoint, boolean temporary)
     {
         final Breakpoint breakpoint = MuleConfigUtils.toMuleBreakpoint(debuggerManager.getProject(), xBreakpoint, modulesToAppsMap);
-        System.out.println("breakpoint removed = " + breakpoint.getApplicationName() + "  , path  " + breakpoint.getPath());
+        logger.info("breakpoint removed = " + breakpoint.getApplicationName() + "  , path  " + breakpoint.getPath());
         debuggerManager.removeBreakpoint(breakpoint);
     }
 }

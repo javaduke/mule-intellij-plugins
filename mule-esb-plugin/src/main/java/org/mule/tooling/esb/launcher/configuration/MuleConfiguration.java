@@ -13,6 +13,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,11 +33,13 @@ public class MuleConfiguration extends ModuleBasedConfiguration implements Modul
     public static final String PREFIX = "MuleESBConfig-";
     public static final String VM_ARGS_FIELD = PREFIX + "VmArgs";
     public static final String MULE_HOME_FIELD = PREFIX + "MuleHome";
+    public static final String MULE_DEBUG_PORT = PREFIX + "DebugPort";
     public static final String CLEAR_DATA_FIELD = PREFIX + "ClearData";
 
     private String vmArgs;
     private String muleHome;
     private String clearData;
+    private String debugPort;
 
     private Module[] modules = new Module[] {};
 
@@ -71,6 +74,7 @@ public class MuleConfiguration extends ModuleBasedConfiguration implements Modul
         this.vmArgs = JDOMExternalizerUtil.readField(element, VM_ARGS_FIELD);
         this.muleHome = JDOMExternalizerUtil.readField(element, MULE_HOME_FIELD);
         this.clearData = JDOMExternalizerUtil.readField(element, CLEAR_DATA_FIELD);
+        this.debugPort = JDOMExternalizerUtil.readField(element, MULE_DEBUG_PORT);
 
         getConfigurationModule().readExternal(element);
     }
@@ -82,6 +86,7 @@ public class MuleConfiguration extends ModuleBasedConfiguration implements Modul
         // Stores the values of this class into the parent
         JDOMExternalizerUtil.writeField(element, VM_ARGS_FIELD, this.getVmArgs());
         JDOMExternalizerUtil.writeField(element, MULE_HOME_FIELD, this.getMuleHome());
+        JDOMExternalizerUtil.writeField(element, MULE_DEBUG_PORT, this.getDebugPort());
         JDOMExternalizerUtil.writeField(element, CLEAR_DATA_FIELD, this.getClearData());
 
         getConfigurationModule().writeExternal(element);
@@ -116,6 +121,15 @@ public class MuleConfiguration extends ModuleBasedConfiguration implements Modul
         {
             throw new RuntimeConfigurationException("Modules list can not be empty.");
         }
+
+        try {
+            int x = Integer.parseInt(getDebugPort());
+            if (x > 65535)
+                throw new Exception();
+        } catch (Exception e) {
+            throw new RuntimeConfigurationException("Debug port can not be empty and must be a valid Integer between 0-65535.");
+        }
+
         super.checkConfiguration();
     }
 
@@ -147,6 +161,14 @@ public class MuleConfiguration extends ModuleBasedConfiguration implements Modul
 
     public void setClearData(@Nullable String clearData) {
         this.clearData = clearData;
+    }
+
+    public String getDebugPort() {
+        return debugPort;
+    }
+
+    public void setDebugPort(String debugPort) {
+        this.debugPort = debugPort;
     }
 
     @NotNull
