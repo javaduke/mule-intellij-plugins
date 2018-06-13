@@ -91,3 +91,7 @@ task doRelease {
                 'Hit CTRL+C to cancel.\n'
     }
 }
+
+intellij {
+    version = ideaVersion
+}
