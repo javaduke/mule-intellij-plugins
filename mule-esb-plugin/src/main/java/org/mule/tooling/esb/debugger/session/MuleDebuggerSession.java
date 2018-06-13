@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+//TODO - this is where the debugger client should be instantiated using a proper classloader
 public class MuleDebuggerSession extends DefaultDebuggerResponseCallback {
 
   private static final int MAX_RETRIES = 30;

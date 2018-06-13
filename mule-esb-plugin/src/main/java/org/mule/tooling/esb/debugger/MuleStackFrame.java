@@ -27,6 +27,7 @@ public class MuleStackFrame extends XStackFrame
     @Nullable
     private ObjectFieldDefinition exceptionThrown;
     private final XmlTag tag;
+    private final Project project;
 
     public MuleStackFrame(@NotNull Project project, @NotNull MuleDebuggerSession session, MuleMessageInfo muleMessageInfo)
     {
@@ -40,6 +41,7 @@ public class MuleStackFrame extends XStackFrame
         this.exceptionThrown = exceptionThrown;
         this.tag = MuleConfigUtils.getTagAt(project, muleMessageInfo.getMessageProcessorInfo().getPath());
         this.position = MuleConfigUtils.createPositionByElement(tag);
+        this.project = project;
     }
 
     @Nullable
@@ -74,6 +76,7 @@ public class MuleStackFrame extends XStackFrame
         children.add("Message Processor", new MessageProcessorInfoValue(this.session, this.muleMessageInfo.getMessageProcessorInfo()));
 
         for (ObjectFieldDefinition definition : this.muleMessageInfo.getDefinitions()) {
+
             children.add(definition.getName(), new ObjectFieldDefinitionValue(this.session, definition, AllIcons.Debugger.Value));
         }
         //children.add("Payload", new ObjectFieldDefinitionValue(this.session, this.muleMessageInfo.getPayloadDefinition(), AllIcons.Debugger.Value));
@@ -84,6 +87,26 @@ public class MuleStackFrame extends XStackFrame
         }
         node.addChildren(children, true);
     }
+
+    /* Mule 3
+    private void addDefinitions(XValueChildrenList children) {
+        if (MuleConfigUtils.isMule4Project(this.project)) {
+            for (ObjectFieldDefinition definition : this.muleMessageInfo.getDefinitions()) {
+                children.add(definition.getName(), new ObjectFieldDefinitionValue(this.session, definition, AllIcons.Debugger.Value));
+            }
+        } else {
+            children.add("Payload", new ObjectFieldDefinitionValue(this.session, this.muleMessageInfo.getPayloadDefinition(), AllIcons.Debugger.Value));
+            if (exceptionThrown != null)
+            {
+                children.add("Exception", new ObjectFieldDefinitionValue(this.session, exceptionThrown, AllIcons.General.Error));
+            }
+            children.add("Flow Vars", new MapOfObjectFieldDefinitionValue(this.session, this.muleMessageInfo.getInvocationProperties(), AllIcons.Nodes.Parameter));
+            children.add("Session Properties", new MapOfObjectFieldDefinitionValue(this.session, this.muleMessageInfo.getSessionProperties(), AllIcons.Nodes.Parameter));
+            children.add("Inbound Properties", new MapOfObjectFieldDefinitionValue(this.session, this.muleMessageInfo.getInboundProperties(), AllIcons.Nodes.Parameter));
+            children.add("OutboundProperties", new MapOfObjectFieldDefinitionValue(this.session, this.muleMessageInfo.getOutboundProperties(), AllIcons.Nodes.Parameter));
+        }
+    }
+    */
 /*
     @Override
     public void computeChildren(@NotNull XCompositeNode node)

@@ -49,8 +49,6 @@ subprojects {
         version = ideaVersion
         updateSinceUntilBuild = false
         downloadSources = true
-        //sandboxDirectory = "${rootProject.buildDir}/idea-sandbox"
-
     }
 
     dependencies {

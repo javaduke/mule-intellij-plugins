@@ -712,6 +712,15 @@ public class MuleConfigUtils {
         return (facets != null && !facets.isEmpty());
     }
 
+    public static boolean isMule4Project(Project project) {
+        List<Module> modules = getMuleModules(project, false);
+        for (Module module :  modules) {
+            if (isMule4Module(module))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isMuleModule(Module module) {
         boolean muleModule = false;
         ProjectFacetManager manager = ProjectFacetManager.getInstance(module.getProject());
